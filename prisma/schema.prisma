@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+  PAUSED
+}
+
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  name               String?
+  password           String
+  avatarUrl          String?
+  emailVerified      Boolean   @default(false)
+  emailVerifiedAt    DateTime?
+  resetToken         String?
+  resetTokenExpiry   DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  // Relations
+  memberships        Member[]
+  invitesSent        Invite[]  @relation("InviteSender")
+  invitesReceived    Invite[]  @relation("InviteRecipient")
+  refreshTokens      RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id          String   @id @default(cuid())
+  token       String   @unique
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+model Organization {
+  id                 String    @id @default(cuid())
+  name               String
+  slug               String    @unique
+  logoUrl            String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  // Relations
+  members            Member[]
+  invites            Invite[]
+  subscription       Subscription?
+
+  @@map("organizations")
+}
+
+model Member {
+  id             String       @id @default(cuid())
+  role           Role         @default(MEMBER)
+  userId         String
+  organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  // Relations
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@map("members")
+}
+
+model Invite {
+  id             String       @id @default(cuid())
+  email          String
+  role           Role         @default(MEMBER)
+  status         InviteStatus @default(PENDING)
+  token          String       @unique @default(cuid())
+  expiresAt      DateTime
+  organizationId String
+  senderId       String
+  recipientId    String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sender         User         @relation("InviteSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient      User?        @relation("InviteRecipient", fields: [recipientId], references: [id], onDelete: SetNull)
+
+  @@map("invites")
+}
+
+model Plan {
+  id            String    @id @default(cuid())
+  name          String    @unique
+  slug          String    @unique
+  description   String?
+  price         Float
+  currency      String    @default("BRL")
+  interval      String    @default("month") // month, year
+  features      String[]
+  maxMembers    Int       @default(1)
+  maxStorage    Int       @default(100) // in MB
+  isActive      Boolean   @default(true)
+  sortOrder     Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id                     String             @id @default(cuid())
+  status                 SubscriptionStatus @default(ACTIVE)
+  organizationId         String             @unique
+  planId                 String
+  abacatePayCustomerId   String?
+  abacatePaySubscriptionId String?
+  currentPeriodStart     DateTime
+  currentPeriodEnd       DateTime
+  cancelAtPeriodEnd      Boolean            @default(false)
+  canceledAt             DateTime?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  // Relations
+  organization           Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan                   Plan               @relation(fields: [planId], references: [id])
+
+  @@map("subscriptions")
+}
+
+model Upload {
+  id          String   @id @default(cuid())
+  filename    String
+  originalName String
+  mimeType    String
+  size        Int
+  url         String
+  bucket      String
+  key         String
+  uploadedBy  String?
+  createdAt   DateTime @default(now())
+
+  @@map("uploads")
+}
