@@ -9,7 +9,7 @@ Um boilerplate completo para construir aplicações SaaS modernas com Next.js 14
 - **Backend**: Next.js API Routes
 - **Banco de Dados**: PostgreSQL + Prisma ORM
 - **Autenticação**: JWT com jose (access + refresh token)
-- **Pagamentos**: AbacatePay
+- **Pagamentos**: Stripe
 - **Storage**: MinIO (S3 compatible)
 - **Email**: Resend
 - **Infraestrutura**: Docker + Docker Compose
@@ -46,11 +46,11 @@ Um boilerplate completo para construir aplicações SaaS modernas com Next.js 14
 - Middleware de verificação de permissões
 - Páginas restritas por role
 
-### Pagamentos com AbacatePay
-- Criar cliente
-- Gerenciar assinatura
-- Webhooks para eventos
+### Pagamentos com Stripe
+- Checkout Session
 - Portal do cliente
+- Webhooks para eventos de assinatura
+- Sincronização automática de status
 - Planos: Free, Pro, Enterprise
 
 ### Upload com MinIO/S3
@@ -152,7 +152,7 @@ npm run docker:build # Builda a imagem Docker
 │   │   ├── members/       # Componentes de membros
 │   │   └── ui/            # Componentes UI (ShadcnUI)
 │   └── lib/               # Utilitários e configurações
-│       ├── abacatepay.ts  # Client AbacatePay
+│       ├── stripe.ts      # Client Stripe
 │       ├── auth.ts        # Funções de autenticação
 │       ├── email.ts       # Client de email (Resend)
 │       ├── prisma.ts      # Client Prisma
@@ -190,9 +190,11 @@ MINIO_BUCKET_NAME=flame-uploads
 RESEND_API_KEY=re_your_api_key
 RESEND_FROM_EMAIL=noreply@yourdomain.com
 
-# AbacatePay
-ABACATEPAY_API_KEY=your_api_key
-ABACATEPAY_WEBHOOK_SECRET=your_webhook_secret
+# Stripe
+STRIPE_SECRET_KEY=sk_test_your_key
+STRIPE_PUBLISHABLE_KEY=pk_test_your_key
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_key
 ```
 
 ## Deploy
