@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 import { guardOrganization } from "@/lib/rbac";
-import { getCustomerPortalUrl, getOrCreateCustomer } from "@/lib/abacatepay";
+import { createPortalSession } from "@/lib/stripe";
 
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Nao autenticado" }, { status: 401 });
+      return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -23,47 +22,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get organization
-    const organization = await prisma.organization.findUnique({
-      where: { id: organizationId },
-      include: {
-        subscription: true,
-      },
-    });
-
-    if (!organization) {
-      return NextResponse.json(
-        { error: "Organizacao nao encontrada" },
-        { status: 404 }
-      );
-    }
-
-    // Check if AbacatePay is configured
-    if (!process.env.ABACATEPAY_API_KEY) {
+    // Check if Stripe is configured
+    if (!process.env.STRIPE_SECRET_KEY) {
       return NextResponse.json({
         url: null,
-        message: "AbacatePay nao configurado",
+        message: "Stripe não configurado",
       });
     }
 
     try {
-      // Get or create customer
-      const customerId = await getOrCreateCustomer(
-        organizationId,
-        user.email,
-        organization.name
-      );
-
       // Get portal URL
       const returnUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/billing`;
-      const { url } = await getCustomerPortalUrl(customerId, returnUrl);
+      const portalUrl = await createPortalSession(organizationId, returnUrl);
 
-      return NextResponse.json({ url });
+      return NextResponse.json({ url: portalUrl });
     } catch (error) {
-      console.error("AbacatePay error:", error);
+      console.error("Stripe error:", error);
       return NextResponse.json({
         url: null,
-        message: "Erro ao conectar com AbacatePay",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Erro ao conectar com Stripe",
       });
     }
   } catch (error) {

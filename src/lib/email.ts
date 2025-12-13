@@ -1,9 +1,19 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@example.com";
+const SMTP_HOST = process.env.SMTP_HOST || "localhost";
+const SMTP_PORT = parseInt(process.env.SMTP_PORT || "1025");
+const FROM_EMAIL = process.env.SMTP_FROM_EMAIL || "noreply@flame.dev";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+// Create transporter
+const transporter = nodemailer.createTransport({
+  host: SMTP_HOST,
+  port: SMTP_PORT,
+  secure: false, // MailHog doesn't use TLS
+  tls: {
+    rejectUnauthorized: false
+  }
+});
 
 interface SendEmailOptions {
   to: string;
@@ -13,19 +23,15 @@ interface SendEmailOptions {
 
 export async function sendEmail({ to, subject, html }: SendEmailOptions) {
   try {
-    const { data, error } = await resend.emails.send({
+    const info = await transporter.sendMail({
       from: FROM_EMAIL,
       to,
       subject,
       html,
     });
 
-    if (error) {
-      console.error("Error sending email:", error);
-      return { success: false, error };
-    }
-
-    return { success: true, data };
+    console.log("Email sent successfully:", info.messageId);
+    return { success: true, data: info };
   } catch (error) {
     console.error("Error sending email:", error);
     return { success: false, error };

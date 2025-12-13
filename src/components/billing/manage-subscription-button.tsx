@@ -41,7 +41,7 @@ export function ManageSubscriptionButton({
         toast({
           title: "Portal nao disponivel",
           description:
-            "O portal de pagamentos nao esta configurado. Configure as credenciais do AbacatePay.",
+            "O portal de pagamentos nao esta configurado. Configure as credenciais do Stripe.",
         });
       }
     } catch (error) {

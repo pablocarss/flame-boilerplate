@@ -13,7 +13,11 @@ export type Permission =
   | "billing:read"
   | "billing:update"
   | "settings:read"
-  | "settings:update";
+  | "settings:update"
+  | "integration:read"
+  | "integration:create"
+  | "integration:update"
+  | "integration:delete";
 
 // Define permissions for each role
 const rolePermissions: Record<Role, Permission[]> = {
@@ -29,11 +33,16 @@ const rolePermissions: Record<Role, Permission[]> = {
     "billing:update",
     "settings:read",
     "settings:update",
+    "integration:read",
+    "integration:create",
+    "integration:update",
+    "integration:delete",
   ],
   MEMBER: [
     "organization:read",
     "member:read",
     "settings:read",
+    "integration:read",
   ],
 };
 

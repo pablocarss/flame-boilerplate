@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Check, CreditCard, Building2 } from "lucide-react";
 import { ManageSubscriptionButton } from "@/components/billing/manage-subscription-button";
+import { SelectPlanButton } from "@/components/billing/select-plan-button";
 
 async function getSubscriptions(userId: string) {
   const memberships = await prisma.member.findMany({
@@ -184,32 +185,43 @@ export default async function BillingPage() {
       <div className="mt-12">
         <h3 className="text-xl font-semibold mb-4">Planos Disponiveis</h3>
         <div className="grid md:grid-cols-3 gap-4">
-          {plans.map((plan) => (
-            <Card key={plan.id}>
-              <CardHeader>
-                <CardTitle>{plan.name}</CardTitle>
-                <CardDescription>{plan.description}</CardDescription>
-                <div className="mt-2">
-                  <span className="text-3xl font-bold">
-                    {formatCurrency(plan.price)}
-                  </span>
-                  <span className="text-muted-foreground">
-                    /{plan.interval === "month" ? "mes" : "ano"}
-                  </span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2 text-sm">
-                      <Check className="h-4 w-4 text-green-500" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          ))}
+          {plans.map((plan) => {
+            // Get user's first admin organization for the select plan button
+            const firstAdminOrg = memberships.find(m => m.role === "ADMIN")?.organization;
+
+            return (
+              <Card key={plan.id}>
+                <CardHeader>
+                  <CardTitle>{plan.name}</CardTitle>
+                  <CardDescription>{plan.description}</CardDescription>
+                  <div className="mt-2">
+                    <span className="text-3xl font-bold">
+                      {formatCurrency(plan.price)}
+                    </span>
+                    <span className="text-muted-foreground">
+                      /{plan.interval === "month" ? "mes" : "ano"}
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 mb-4">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-center gap-2 text-sm">
+                        <Check className="h-4 w-4 text-green-500" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  {firstAdminOrg && (
+                    <SelectPlanButton
+                      organizationId={firstAdminOrg.id}
+                      planSlug={plan.slug}
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </div>

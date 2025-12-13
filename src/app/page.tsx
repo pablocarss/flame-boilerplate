@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +23,13 @@ import {
   Twitter,
   Linkedin,
   ArrowRight,
+  Loader2,
+  ShoppingCart,
+  Sparkles,
 } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const features = [
   {
@@ -40,7 +48,7 @@ const features = [
     icon: CreditCard,
     title: "Pagamentos Integrados",
     description:
-      "Integração com AbacatePay para assinaturas, webhooks e portal do cliente.",
+      "Integração com Stripe para assinaturas, webhooks e portal do cliente.",
   },
   {
     icon: Cloud,
@@ -62,66 +70,92 @@ const features = [
   },
 ];
 
-const plans = [
-  {
-    name: "Free",
-    description: "Para começar sua jornada",
-    price: "R$ 0",
-    interval: "/mês",
-    features: [
-      "1 usuário",
-      "100MB de armazenamento",
-      "Suporte por email",
-      "Funcionalidades básicas",
-    ],
-    cta: "Começar Grátis",
-    popular: false,
-  },
-  {
-    name: "Pro",
-    description: "Para equipes em crescimento",
-    price: "R$ 49,90",
-    interval: "/mês",
-    features: [
-      "Até 10 usuários",
-      "10GB de armazenamento",
-      "Suporte prioritário",
-      "Todas as funcionalidades",
-      "Relatórios avançados",
-      "API access",
-    ],
-    cta: "Assinar Pro",
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    description: "Para grandes organizações",
-    price: "R$ 199,90",
-    interval: "/mês",
-    features: [
-      "Usuários ilimitados",
-      "Armazenamento ilimitado",
-      "Suporte 24/7",
-      "Todas as funcionalidades",
-      "Relatórios customizados",
-      "API access",
-      "SSO/SAML",
-      "SLA garantido",
-    ],
-    cta: "Falar com Vendas",
-    popular: false,
-  },
-];
-
 export default function HomePage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleSelectPlan = async () => {
+    setIsLoading(true);
+
+    try {
+      // First, check if user is logged in
+      const meResponse = await fetch("/api/auth/me");
+
+      if (!meResponse.ok) {
+        // Not logged in, redirect to register
+        window.location.href = "/auth/register";
+        return;
+      }
+
+      const { user } = await meResponse.json();
+
+      // Get user's organizations
+      const orgsResponse = await fetch("/api/organizations");
+      const { organizations } = await orgsResponse.json();
+
+      if (!organizations || organizations.length === 0) {
+        // No organization, redirect to create one
+        toast({
+          title: "Crie uma organização primeiro",
+          description: "Você precisa ter uma organização para assinar um plano.",
+        });
+        window.location.href = "/dashboard/organizations/new";
+        return;
+      }
+
+      // Use the first organization
+      const organizationId = organizations[0].id;
+
+      // Create checkout session
+      const checkoutResponse = await fetch("/api/billing/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          organizationId,
+          planSlug: "pro",
+        }),
+      });
+
+      const result = await checkoutResponse.json();
+
+      if (!checkoutResponse.ok) {
+        throw new Error(result.error || "Erro ao criar checkout");
+      }
+
+      if (result.url) {
+        // Redirect to Stripe checkout
+        window.location.href = result.url;
+      } else {
+        toast({
+          title: "Erro",
+          description: "URL de checkout não disponível",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description:
+          error instanceof Error ? error.message : "Erro ao criar checkout",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
         <div className="container flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <Flame className="h-6 w-6 text-orange-500" />
-            <span className="text-xl font-bold">Flame</span>
+            <div className="relative">
+              <Flame className="h-6 w-6 text-primary" />
+              <Sparkles className="h-3 w-3 text-primary absolute -top-1 -right-1 animate-pulse" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">Flame</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             <Link
@@ -142,7 +176,8 @@ export default function HomePage() {
             >
               Login
             </Link>
-            <Button asChild>
+            <ThemeToggle />
+            <Button asChild className="shadow-lg">
               <Link href="/auth/register">Começar Grátis</Link>
             </Button>
           </nav>
@@ -184,6 +219,35 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Trusted By Section */}
+        <section className="container py-16 border-y bg-muted/30 backdrop-blur-sm">
+          <div className="text-center mb-12">
+            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              Tecnologias utilizadas por empresas líderes
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center opacity-60 hover:opacity-100 transition-opacity">
+            <div className="flex items-center justify-center">
+              <div className="text-2xl font-bold">Netflix</div>
+            </div>
+            <div className="flex items-center justify-center">
+              <div className="text-2xl font-bold">Spotify</div>
+            </div>
+            <div className="flex items-center justify-center">
+              <div className="text-2xl font-bold">Uber</div>
+            </div>
+            <div className="flex items-center justify-center">
+              <div className="text-2xl font-bold">Airbnb</div>
+            </div>
+            <div className="flex items-center justify-center">
+              <div className="text-2xl font-bold">Tesla</div>
+            </div>
+            <div className="flex items-center justify-center">
+              <div className="text-2xl font-bold">Nike</div>
+            </div>
+          </div>
+        </section>
+
         {/* Features Section */}
         <section id="features" className="container py-24 bg-muted/50">
           <div className="text-center mb-16">
@@ -197,9 +261,9 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="border-0 shadow-sm">
+              <Card key={index} className="border-border/50 shadow-lg backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/10 flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-primary" />
                   </div>
                   <CardTitle className="text-xl">{feature.title}</CardTitle>
@@ -216,57 +280,75 @@ export default function HomePage() {
         <section id="pricing" className="container py-24">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Planos simples e transparentes
+              Plano simples e transparente
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Escolha o plano ideal para o seu negócio. Sem surpresas, sem taxas
+              Comece agora e escale seu negócio. Sem surpresas, sem taxas
               escondidas.
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {plans.map((plan, index) => (
-              <Card
-                key={index}
-                className={`relative ${
-                  plan.popular ? "border-primary shadow-lg scale-105" : ""
-                }`}
-              >
-                {plan.popular && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    Mais Popular
-                  </Badge>
-                )}
-                <CardHeader className="text-center">
-                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                  <CardDescription>{plan.description}</CardDescription>
-                  <div className="mt-4">
-                    <span className="text-4xl font-bold">{plan.price}</span>
-                    <span className="text-muted-foreground">
-                      {plan.interval}
-                    </span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3">
-                    {plan.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center gap-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                <CardFooter>
-                  <Button
-                    className="w-full"
-                    variant={plan.popular ? "default" : "outline"}
-                    asChild
-                  >
-                    <Link href="/auth/register">{plan.cta}</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
+          <div className="flex justify-center">
+            <Card className="relative border-primary shadow-lg w-full max-w-md">
+              <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
+                Melhor Escolha
+              </Badge>
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl">Pro</CardTitle>
+                <CardDescription>Para equipes em crescimento</CardDescription>
+                <div className="mt-4">
+                  <span className="text-4xl font-bold">R$ 52,00</span>
+                  <span className="text-muted-foreground">/mês</span>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500" />
+                    <span className="text-sm">Até 10 usuários</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500" />
+                    <span className="text-sm">10GB de armazenamento</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500" />
+                    <span className="text-sm">Suporte prioritário</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500" />
+                    <span className="text-sm">Todas as funcionalidades</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500" />
+                    <span className="text-sm">Relatórios avançados</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500" />
+                    <span className="text-sm">API access</span>
+                  </li>
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Button
+                  className="w-full"
+                  onClick={handleSelectPlan}
+                  disabled={isLoading}
+                  size="lg"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processando...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      Assinar Agora
+                    </>
+                  )}
+                </Button>
+              </CardFooter>
+            </Card>
           </div>
         </section>
 

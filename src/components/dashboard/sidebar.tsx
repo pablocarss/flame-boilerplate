@@ -11,6 +11,7 @@ import {
   CreditCard,
   Building2,
   Mail,
+  Puzzle,
 } from "lucide-react";
 
 const navigation = [
@@ -38,6 +39,11 @@ const navigation = [
     name: "Assinatura",
     href: "/dashboard/billing",
     icon: CreditCard,
+  },
+  {
+    name: "Plugins",
+    href: "/dashboard/plugins",
+    icon: Puzzle,
   },
   {
     name: "Configuracoes",

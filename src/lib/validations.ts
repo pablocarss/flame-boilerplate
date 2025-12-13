@@ -80,6 +80,39 @@ export const updateMemberRoleSchema = z.object({
   role: z.enum(["ADMIN", "MEMBER"]),
 });
 
+// Integration validations
+export const integrationProviderSchema = z.enum([
+  "chatgpt",
+  "zapier",
+  "figma",
+  "google-drive",
+  "calendar",
+  "slack",
+  "notion",
+  "github",
+  "gitlab",
+  "trello",
+]);
+
+export const createIntegrationSchema = z.object({
+  organizationId: z.string().min(1, "Organização é obrigatória"),
+  provider: integrationProviderSchema,
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres").max(100),
+  apiKey: z.string().min(10, "API Key deve ter pelo menos 10 caracteres").optional(),
+  accessToken: z.string().min(10, "Access Token deve ter pelo menos 10 caracteres").optional(),
+  refreshToken: z.string().min(10, "Refresh Token deve ter pelo menos 10 caracteres").optional(),
+  config: z.record(z.any()).optional(),
+});
+
+export const updateIntegrationSchema = z.object({
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres").max(100).optional(),
+  apiKey: z.string().min(10, "API Key deve ter pelo menos 10 caracteres").optional(),
+  accessToken: z.string().min(10, "Access Token deve ter pelo menos 10 caracteres").optional(),
+  refreshToken: z.string().min(10, "Refresh Token deve ter pelo menos 10 caracteres").optional(),
+  config: z.record(z.any()).optional(),
+  status: z.enum(["ACTIVE", "INACTIVE", "ERROR"]).optional(),
+});
+
 // Types
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
@@ -91,3 +124,6 @@ export type CreateInviteInput = z.infer<typeof createInviteSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 export type UpdateMemberRoleInput = z.infer<typeof updateMemberRoleSchema>;
+export type IntegrationProvider = z.infer<typeof integrationProviderSchema>;
+export type CreateIntegrationInput = z.infer<typeof createIntegrationSchema>;
+export type UpdateIntegrationInput = z.infer<typeof updateIntegrationSchema>;

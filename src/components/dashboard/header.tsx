@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getInitials } from "@/lib/utils";
 import { LogOut, Settings, User } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import type { UserSession } from "@/lib/auth";
 
 interface DashboardHeaderProps {
@@ -29,11 +30,13 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   };
 
   return (
-    <header className="h-16 border-b bg-background flex items-center justify-between px-6">
+    <header className="h-16 border-b bg-background flex items-center justify-between px-6 shadow-sm">
       <div className="flex items-center gap-4">
         <h1 className="text-lg font-semibold">Dashboard</h1>
       </div>
-      <DropdownMenu>
+      <div className="flex items-center gap-4">
+        <ThemeToggle />
+        <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
             <Avatar className="h-10 w-10">
@@ -72,7 +75,8 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
             <span>Sair</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
+        </DropdownMenu>
+      </div>
     </header>
   );
 }

@@ -72,6 +72,7 @@ model Organization {
   members            Member[]
   invites            Invite[]
   subscription       Subscription?
+  integrations       Integration[]
 
   @@map("organizations")
 }
@@ -114,20 +115,22 @@ model Invite {
 }
 
 model Plan {
-  id            String    @id @default(cuid())
-  name          String    @unique
-  slug          String    @unique
-  description   String?
-  price         Float
-  currency      String    @default("BRL")
-  interval      String    @default("month") // month, year
-  features      String[]
-  maxMembers    Int       @default(1)
-  maxStorage    Int       @default(100) // in MB
-  isActive      Boolean   @default(true)
-  sortOrder     Int       @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id              String    @id @default(cuid())
+  name            String    @unique
+  slug            String    @unique
+  description     String?
+  price           Float
+  currency        String    @default("BRL")
+  interval        String    @default("month") // month, year
+  features        String[]
+  maxMembers      Int       @default(1)
+  maxStorage      Int       @default(100) // in MB
+  isActive        Boolean   @default(true)
+  sortOrder       Int       @default(0)
+  stripeProductId String?
+  stripePriceId   String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   // Relations
   subscriptions Subscription[]
@@ -136,22 +139,22 @@ model Plan {
 }
 
 model Subscription {
-  id                     String             @id @default(cuid())
-  status                 SubscriptionStatus @default(ACTIVE)
-  organizationId         String             @unique
-  planId                 String
-  abacatePayCustomerId   String?
-  abacatePaySubscriptionId String?
-  currentPeriodStart     DateTime
-  currentPeriodEnd       DateTime
-  cancelAtPeriodEnd      Boolean            @default(false)
-  canceledAt             DateTime?
-  createdAt              DateTime           @default(now())
-  updatedAt              DateTime           @updatedAt
+  id                       String             @id @default(cuid())
+  status                   SubscriptionStatus @default(ACTIVE)
+  organizationId           String             @unique
+  planId                   String
+  stripeCustomerId         String?
+  stripeSubscriptionId     String?
+  currentPeriodStart       DateTime
+  currentPeriodEnd         DateTime
+  cancelAtPeriodEnd        Boolean            @default(false)
+  canceledAt               DateTime?
+  createdAt                DateTime           @default(now())
+  updatedAt                DateTime           @updatedAt
 
   // Relations
-  organization           Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  plan                   Plan               @relation(fields: [planId], references: [id])
+  organization             Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan                     Plan               @relation(fields: [planId], references: [id])
 
   @@map("subscriptions")
 }
@@ -169,4 +172,31 @@ model Upload {
   createdAt   DateTime @default(now())
 
   @@map("uploads")
+}
+
+enum IntegrationStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}
+
+model Integration {
+  id              String            @id @default(cuid())
+  organizationId  String
+  provider        String            // chatgpt, zapier, figma, google-drive, calendar, etc
+  name            String
+  apiKey          String?           // Encrypted API key
+  accessToken     String?           // Encrypted access token
+  refreshToken    String?           // Encrypted refresh token
+  config          Json?             // Additional configuration
+  status          IntegrationStatus @default(ACTIVE)
+  lastSyncAt      DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  // Relations
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, provider])
+  @@map("integrations")
 }

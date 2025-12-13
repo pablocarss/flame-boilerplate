@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test:*)",
+      "Bash(cp:*)",
+      "Bash(pnpm install:*)",
+      "Bash(docker-compose down:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(pnpm db:migrate:*)",
+      "Bash(pnpm dev)",
+      "Bash(pnpm db:push:*)",
+      "Bash(pnpm db:seed:*)",
+      "Bash(docker ps:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm db:generate:*)",
+      "Bash(where scoop:*)",
+      "Bash(pnpm prisma generate:*)",
+      "Bash(taskkill:*)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)",
+      "Bash(powershell:*)",
+      "Bash(pnpm prisma db push:*)",
+      "Bash(rm:*)",
+      "Bash(pnpm prisma studio:*)",
+      "Bash(node:*)"
+    ]
+  }
+}
