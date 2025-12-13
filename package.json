@@ -16,7 +16,9 @@
     "db:studio": "prisma studio",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "docker:build": "docker-compose build"
+    "docker:build": "docker-compose build",
+    "mcp:build": "tsc mcp/server.ts --outDir mcp --module commonjs --target es2020 --moduleResolution node --esModuleInterop",
+    "mcp:start": "node mcp/server.js"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -41,6 +43,7 @@
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "date-fns": "^4.1.0",
     "jose": "^5.2.2",
     "lucide-react": "^0.330.0",
     "minio": "^7.1.3",

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "flame-boilerplate": {
+      "command": "node",
+      "args": ["./mcp/server.js"],
+      "env": {
+        "DATABASE_URL": "${DATABASE_URL}"
+      }
+    }
+  }
+}

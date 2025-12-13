@@ -45,6 +45,7 @@ model User {
   invitesSent        Invite[]  @relation("InviteSender")
   invitesReceived    Invite[]  @relation("InviteRecipient")
   refreshTokens      RefreshToken[]
+  notifications      Notification[]
 
   @@map("users")
 }
@@ -73,6 +74,9 @@ model Organization {
   invites            Invite[]
   subscription       Subscription?
   integrations       Integration[]
+  apiKeys            ApiKey[]
+  submissions        Submission[]
+  leads              Lead[]
 
   @@map("organizations")
 }
@@ -180,6 +184,18 @@ enum IntegrationStatus {
   ERROR
 }
 
+enum NotificationType {
+  INVITE
+  MEMBER_ADDED
+  MEMBER_REMOVED
+  ROLE_CHANGED
+  SUBSCRIPTION_CREATED
+  SUBSCRIPTION_CANCELED
+  INTEGRATION_CONNECTED
+  INTEGRATION_ERROR
+  GENERAL
+}
+
 model Integration {
   id              String            @id @default(cuid())
   organizationId  String
@@ -199,4 +215,117 @@ model Integration {
 
   @@unique([organizationId, provider])
   @@map("integrations")
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  type        NotificationType @default(GENERAL)
+  title       String
+  message     String
+  read        Boolean          @default(false)
+  actionUrl   String?
+  metadata    Json?
+  createdAt   DateTime         @default(now())
+
+  // Relations
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model ApiKey {
+  id              String    @id @default(cuid())
+  name            String
+  key             String    @unique
+  organizationId  String
+  createdBy       String
+  lastUsedAt      DateTime?
+  expiresAt       DateTime?
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("api_keys")
+}
+
+enum SubmissionStatus {
+  PENDING
+  REVIEWED
+  APPROVED
+  REJECTED
+  ARCHIVED
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  WON
+  LOST
+}
+
+enum LeadSource {
+  WEBSITE
+  REFERRAL
+  SOCIAL_MEDIA
+  EMAIL_CAMPAIGN
+  COLD_CALL
+  EVENT
+  PARTNER
+  OTHER
+}
+
+model Submission {
+  id              String           @id @default(cuid())
+  organizationId  String
+  userId          String?
+  formType        String           // contact, lead, support, custom
+  data            Json             // Dados do formulário
+  status          SubmissionStatus @default(PENDING)
+  notes           String?
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  source          String?          // web, mobile, api
+  ipAddress       String?
+  userAgent       String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  // Relations
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("submissions")
+}
+
+model Lead {
+  id              String      @id @default(cuid())
+  organizationId  String
+  name            String
+  email           String
+  phone           String?
+  company         String?
+  position        String?
+  status          LeadStatus  @default(NEW)
+  source          LeadSource  @default(WEBSITE)
+  value           Float?      // Valor estimado do negócio
+  notes           String?
+  assignedTo      String?     // ID do usuário responsável
+  lastContactAt   DateTime?
+  nextFollowUpAt  DateTime?
+  convertedAt     DateTime?   // Quando virou cliente
+  tags            String[]    @default([])
+  customFields    Json?       // Campos personalizados
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("leads")
 }

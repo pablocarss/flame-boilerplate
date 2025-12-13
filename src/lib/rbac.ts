@@ -17,7 +17,19 @@ export type Permission =
   | "integration:read"
   | "integration:create"
   | "integration:update"
-  | "integration:delete";
+  | "integration:delete"
+  | "apikey:read"
+  | "apikey:create"
+  | "apikey:update"
+  | "apikey:delete"
+  | "submission:read"
+  | "submission:create"
+  | "submission:update"
+  | "submission:delete"
+  | "lead:read"
+  | "lead:create"
+  | "lead:update"
+  | "lead:delete";
 
 // Define permissions for each role
 const rolePermissions: Record<Role, Permission[]> = {
@@ -37,6 +49,18 @@ const rolePermissions: Record<Role, Permission[]> = {
     "integration:create",
     "integration:update",
     "integration:delete",
+    "apikey:read",
+    "apikey:create",
+    "apikey:update",
+    "apikey:delete",
+    "submission:read",
+    "submission:create",
+    "submission:update",
+    "submission:delete",
+    "lead:read",
+    "lead:create",
+    "lead:update",
+    "lead:delete",
   ],
   MEMBER: [
     "organization:read",

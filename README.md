@@ -95,6 +95,70 @@ Um boilerplate completo e production-ready para construir aplicações SaaS mode
 - Last sync tracking
 - Permissões RBAC para gerenciar integrações
 
+### Sistema de Notificações
+- **Notificações em tempo real** com polling automático
+- **Dropdown de notificações** no header do dashboard com badge de não lidas
+- **Página completa de notificações** com filtros (todas/não lidas)
+- **Tipos de notificação**: Convites, membros, assinaturas, integrações, geral
+- **Marcar como lida** individual ou todas de uma vez
+- **Action URLs** para redirecionar para contexto relevante
+- **Auto-refresh** a cada 30 segundos
+- **Contador de não lidas** em tempo real
+- Permissões RBAC integradas
+
+### Sistema de API Keys
+- **Geração segura de API keys** no formato `flame_live_xxxxxxxxxxxx`
+- **Hash SHA-256** para armazenamento seguro
+- **Chave completa mostrada apenas uma vez** na criação
+- **Ativar/desativar** API keys
+- **Tracking de último uso** e expiração
+- **Mascaramento de chaves** (apenas últimos 8 caracteres visíveis)
+- **Dashboard de gerenciamento** com documentação de uso
+- **Múltiplas keys por organização**
+- Ideal para integrações sistema-a-sistema
+- Permissões RBAC (apikey:read, create, update, delete)
+
+### Sistema de Submissões
+- **Gerenciamento de formulários** e submissões
+- **Status workflow**: PENDING → REVIEWED → APPROVED/REJECTED → ARCHIVED
+- **Captura automática** de IP, User Agent e origem
+- **Tipos de formulário**: contact, lead, support, custom
+- **Dados estruturados em JSON** com visualização formatada
+- **Adicionar notas** e comentários nas submissões
+- **Filtros por status** e tipo de formulário
+- **Modal de visualização/edição** detalhada
+- **Review tracking** com usuário e timestamp
+- Permissões RBAC integradas
+
+### Sistema de Leads (CRM)
+- **CRM completo** para gestão de leads e oportunidades
+- **Pipeline de vendas**: NEW → CONTACTED → QUALIFIED → PROPOSAL → NEGOTIATION → WON/LOST
+- **Origens rastreáveis**: Website, Referral, Social Media, Email Campaign, Cold Call, Event, Partner
+- **Dashboard com métricas**: Total de leads, novos, em negociação, valor total
+- **Gestão completa de informações**: Nome, email, telefone, empresa, cargo, valor estimado
+- **Follow-ups e próximos passos** com datas
+- **Tags personalizáveis** para categorização
+- **Campos customizados** (JSON) para flexibilidade
+- **Data de conversão** automática ao fechar venda (WON)
+- **Filtros por status** e origem
+- **Formulário completo** de criação e edição
+- Permissões RBAC (lead:read, create, update, delete)
+
+### Model Context Protocol (MCP)
+- **Servidor MCP** completo para integração com IA
+- **Ferramentas disponíveis**:
+  - `create_organization` - Criar organizações
+  - `create_lead` - Criar leads no CRM
+  - `list_leads` - Listar leads com filtros
+  - `update_lead_status` - Atualizar pipeline de vendas
+  - `create_notification` - Criar notificações
+  - `list_submissions` - Listar submissões
+  - `get_organization_stats` - Obter estatísticas
+- **Integração com Claude Desktop** e outros clientes MCP
+- **Documentação completa** em `mcp/README.md`
+- **Scripts de build e execução** incluídos
+- Acesso direto ao banco de dados via Prisma
+
 ### Upload com MinIO/S3
 - Upload de arquivos (avatars, documentos, etc.)
 - Presigned URLs para upload seguro
@@ -113,6 +177,10 @@ Um boilerplate completo e production-ready para construir aplicações SaaS mode
 - **Subscription**: Assinaturas Stripe
 - **Upload**: Uploads de arquivos
 - **Integration**: Integrações de terceiros
+- **Notification**: Sistema de notificações
+- **ApiKey**: API keys para integrações
+- **Submission**: Submissões de formulários
+- **Lead**: CRM de leads e oportunidades
 - Seeds para dados iniciais
 - Migrations versionadas
 
@@ -265,6 +333,10 @@ pnpm db:studio        # Abre o Prisma Studio
 pnpm docker:up        # Sobe os containers Docker
 pnpm docker:down      # Para os containers Docker
 pnpm docker:build     # Builda a imagem Docker
+
+# Model Context Protocol (MCP)
+pnpm mcp:build        # Compila o servidor MCP
+pnpm mcp:start        # Inicia o servidor MCP
 ```
 
 ## Estrutura do Projeto
@@ -395,6 +467,33 @@ pnpm docker:build     # Builda a imagem Docker
 - `PATCH /api/profile` - Atualizar perfil
 - `PATCH /api/profile/password` - Alterar senha
 
+### Notificações
+- `GET /api/notifications` - Listar notificações do usuário
+- `POST /api/notifications` - Criar notificação
+- `PATCH /api/notifications/:id` - Marcar como lida
+- `DELETE /api/notifications/:id` - Deletar notificação
+- `PATCH /api/notifications/mark-all-read` - Marcar todas como lidas
+
+### API Keys
+- `GET /api/api-keys?organizationId=` - Listar API keys
+- `POST /api/api-keys` - Criar nova API key (retorna chave completa apenas 1x)
+- `PATCH /api/api-keys/:id` - Ativar/desativar API key
+- `DELETE /api/api-keys/:id` - Deletar API key
+
+### Submissões
+- `GET /api/submissions?organizationId=` - Listar submissões
+- `POST /api/submissions` - Criar submissão
+- `GET /api/submissions/:id` - Obter detalhes da submissão
+- `PATCH /api/submissions/:id` - Atualizar status/notas
+- `DELETE /api/submissions/:id` - Deletar submissão
+
+### Leads (CRM)
+- `GET /api/leads?organizationId=` - Listar leads
+- `POST /api/leads` - Criar novo lead
+- `GET /api/leads/:id` - Obter detalhes do lead
+- `PATCH /api/leads/:id` - Atualizar lead
+- `DELETE /api/leads/:id` - Deletar lead
+
 ## Variáveis de Ambiente
 
 Veja `.env.example` para todas as variáveis disponíveis. **Nunca commite o arquivo `.env` com dados reais.**
@@ -487,16 +586,22 @@ docker-compose --profile production up -d
 
 ## Roadmap
 
-- [ ] Sistema de notificações
+- [x] Sistema de notificações ✅
+- [x] Sistema de API Keys ✅
+- [x] Sistema de Submissões ✅
+- [x] CRM de Leads ✅
+- [x] Model Context Protocol (MCP) ✅
 - [ ] Auditoria de ações (audit log)
 - [ ] Rate limiting com Redis
-- [ ] Criptografia de API keys
+- [ ] Criptografia de API keys armazenadas
 - [ ] Testes unitários e E2E
 - [ ] CI/CD pipeline
 - [ ] Documentação Swagger/OpenAPI
 - [ ] Multi-idioma (i18n)
 - [ ] Analytics e métricas
 - [ ] Sistema de tickets/suporte
+- [ ] Kanban board para leads
+- [ ] Email tracking e templates
 
 ## Contribuindo
 
@@ -511,6 +616,10 @@ Contribuições são bem-vindas! Por favor:
 ## Licença
 
 MIT
+
+## Autor
+
+**Pablo Cardoso**
 
 ---
 

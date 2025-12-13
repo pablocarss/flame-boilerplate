@@ -12,6 +12,9 @@ import {
   Building2,
   Mail,
   Puzzle,
+  Bell,
+  Key,
+  FileText,
 } from "lucide-react";
 
 const navigation = [
@@ -19,6 +22,11 @@ const navigation = [
     name: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    name: "Notificações",
+    href: "/dashboard/notifications",
+    icon: Bell,
   },
   {
     name: "Organizacoes",
@@ -44,6 +52,21 @@ const navigation = [
     name: "Plugins",
     href: "/dashboard/plugins",
     icon: Puzzle,
+  },
+  {
+    name: "API Keys",
+    href: "/dashboard/api-keys",
+    icon: Key,
+  },
+  {
+    name: "Submissões",
+    href: "/dashboard/submissions",
+    icon: FileText,
+  },
+  {
+    name: "Leads",
+    href: "/dashboard/leads",
+    icon: Users,
   },
   {
     name: "Configuracoes",

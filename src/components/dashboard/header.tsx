@@ -14,6 +14,7 @@ import {
 import { getInitials } from "@/lib/utils";
 import { LogOut, Settings, User } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { NotificationsDropdown } from "@/components/dashboard/notifications-dropdown";
 import type { UserSession } from "@/lib/auth";
 
 interface DashboardHeaderProps {
@@ -36,6 +37,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
       </div>
       <div className="flex items-center gap-4">
         <ThemeToggle />
+        <NotificationsDropdown />
         <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -58,7 +60,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            onClick={() => router.push("/dashboard/settings/profile")}
+            onClick={() => router.push("/dashboard/settings")}
           >
             <User className="mr-2 h-4 w-4" />
             <span>Perfil</span>
@@ -67,7 +69,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
             onClick={() => router.push("/dashboard/settings")}
           >
             <Settings className="mr-2 h-4 w-4" />
-            <span>Configuracoes</span>
+            <span>Configurações</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>
