@@ -175,9 +175,18 @@ export default function DocsPage() {
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
           {sections.map((section, index) => (
-            <Card
+            <Link
               key={index}
-              className="hover:shadow-lg transition-shadow cursor-pointer group"
+              href={
+                section.title === "Início Rápido"
+                  ? "/docs/getting-started"
+                  : section.title === "API Reference"
+                  ? "/docs/api"
+                  : "#"
+              }
+            >
+            <Card
+              className="hover:shadow-lg transition-shadow cursor-pointer group h-full"
             >
               <CardHeader>
                 <div className="flex items-start gap-4">
@@ -206,6 +215,7 @@ export default function DocsPage() {
                 </ul>
               </CardContent>
             </Card>
+            </Link>
           ))}
         </div>
 
@@ -217,7 +227,7 @@ export default function DocsPage() {
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Link
-                href="https://github.com"
+                href="https://github.com/pablocarss/flame-boilerplate"
                 target="_blank"
                 className="flex items-center gap-3 p-4 rounded-lg border bg-background hover:bg-muted transition-colors"
               >

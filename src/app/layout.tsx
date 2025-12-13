@@ -10,6 +10,11 @@ export const metadata: Metadata = {
   title: "Flame Boilerplate - Next.js SaaS Starter",
   description:
     "Complete Next.js 14 boilerplate with authentication, payments, organizations, and more.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -23,7 +28,7 @@ export default function RootLayout({
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          enableSystem
+          enableSystem={false}
           disableTransitionOnChange
         >
           {children}

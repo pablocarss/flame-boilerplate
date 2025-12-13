@@ -30,6 +30,7 @@ import {
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { CompanyLogos } from "@/components/company-logos";
 
 const features = [
   {
@@ -220,7 +221,7 @@ export default function HomePage() {
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <Link
-                  href="https://github.com"
+                  href="https://github.com/pablocarss/flame-boilerplate"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -240,52 +241,22 @@ export default function HomePage() {
           </div>
           <div className="relative flex overflow-x-hidden">
             <div className="flex animate-marquee whitespace-nowrap py-4">
-              {[
-                "Netflix",
-                "Spotify",
-                "Uber",
-                "Airbnb",
-                "Tesla",
-                "Nike",
-                "Google",
-                "Microsoft",
-                "Amazon",
-                "Meta",
-                "Apple",
-                "Twitter",
-              ].map((company, index) => (
+              {Object.entries(CompanyLogos).map(([name, Logo], index) => (
                 <div
                   key={`first-${index}`}
-                  className="mx-8 flex items-center justify-center"
+                  className="mx-12 flex items-center justify-center text-muted-foreground/40 hover:text-foreground/60 transition-colors"
                 >
-                  <div className="text-2xl md:text-3xl font-bold text-muted-foreground/50 hover:text-foreground/70 transition-colors">
-                    {company}
-                  </div>
+                  <Logo />
                 </div>
               ))}
             </div>
             <div className="absolute top-0 flex animate-marquee2 whitespace-nowrap py-4">
-              {[
-                "Netflix",
-                "Spotify",
-                "Uber",
-                "Airbnb",
-                "Tesla",
-                "Nike",
-                "Google",
-                "Microsoft",
-                "Amazon",
-                "Meta",
-                "Apple",
-                "Twitter",
-              ].map((company, index) => (
+              {Object.entries(CompanyLogos).map(([name, Logo], index) => (
                 <div
                   key={`second-${index}`}
-                  className="mx-8 flex items-center justify-center"
+                  className="mx-12 flex items-center justify-center text-muted-foreground/40 hover:text-foreground/60 transition-colors"
                 >
-                  <div className="text-2xl md:text-3xl font-bold text-muted-foreground/50 hover:text-foreground/70 transition-colors">
-                    {company}
-                  </div>
+                  <Logo />
                 </div>
               ))}
             </div>
@@ -430,7 +401,7 @@ export default function HomePage() {
               </p>
               <div className="flex gap-4">
                 <Link
-                  href="https://github.com"
+                  href="https://github.com/pablocarss/flame-boilerplate"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-foreground transition-colors"
