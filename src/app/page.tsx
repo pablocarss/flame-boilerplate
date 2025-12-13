@@ -171,6 +171,18 @@ export default function HomePage() {
               Preços
             </Link>
             <Link
+              href="/docs"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Docs
+            </Link>
+            <Link
+              href="/blog"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Blog
+            </Link>
+            <Link
               href="/auth/login"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
@@ -220,30 +232,62 @@ export default function HomePage() {
         </section>
 
         {/* Trusted By Section */}
-        <section className="container py-16 border-y bg-muted/30 backdrop-blur-sm">
+        <section className="py-16 border-y bg-muted/30 backdrop-blur-sm overflow-hidden">
           <div className="text-center mb-12">
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
               Tecnologias utilizadas por empresas líderes
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center opacity-60 hover:opacity-100 transition-opacity">
-            <div className="flex items-center justify-center">
-              <div className="text-2xl font-bold">Netflix</div>
+          <div className="relative flex overflow-x-hidden">
+            <div className="flex animate-marquee whitespace-nowrap py-4">
+              {[
+                "Netflix",
+                "Spotify",
+                "Uber",
+                "Airbnb",
+                "Tesla",
+                "Nike",
+                "Google",
+                "Microsoft",
+                "Amazon",
+                "Meta",
+                "Apple",
+                "Twitter",
+              ].map((company, index) => (
+                <div
+                  key={`first-${index}`}
+                  className="mx-8 flex items-center justify-center"
+                >
+                  <div className="text-2xl md:text-3xl font-bold text-muted-foreground/50 hover:text-foreground/70 transition-colors">
+                    {company}
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="flex items-center justify-center">
-              <div className="text-2xl font-bold">Spotify</div>
-            </div>
-            <div className="flex items-center justify-center">
-              <div className="text-2xl font-bold">Uber</div>
-            </div>
-            <div className="flex items-center justify-center">
-              <div className="text-2xl font-bold">Airbnb</div>
-            </div>
-            <div className="flex items-center justify-center">
-              <div className="text-2xl font-bold">Tesla</div>
-            </div>
-            <div className="flex items-center justify-center">
-              <div className="text-2xl font-bold">Nike</div>
+            <div className="absolute top-0 flex animate-marquee2 whitespace-nowrap py-4">
+              {[
+                "Netflix",
+                "Spotify",
+                "Uber",
+                "Airbnb",
+                "Tesla",
+                "Nike",
+                "Google",
+                "Microsoft",
+                "Amazon",
+                "Meta",
+                "Apple",
+                "Twitter",
+              ].map((company, index) => (
+                <div
+                  key={`second-${index}`}
+                  className="mx-8 flex items-center justify-center"
+                >
+                  <div className="text-2xl md:text-3xl font-bold text-muted-foreground/50 hover:text-foreground/70 transition-colors">
+                    {company}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -436,6 +480,14 @@ export default function HomePage() {
                     className="text-muted-foreground hover:text-foreground transition-colors"
                   >
                     Documentação
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/blog"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Blog
                   </Link>
                 </li>
               </ul>
