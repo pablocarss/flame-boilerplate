@@ -2,6 +2,42 @@
 
 Um boilerplate completo e production-ready para construir aplicações SaaS modernas com Next.js 14, TypeScript, Prisma, PostgreSQL e Stripe.
 
+## 🚀 Quick Start com CLI
+
+A forma mais rápida de criar um novo projeto com Flame Boilerplate:
+
+```bash
+# Entre na pasta da CLI
+cd cli
+
+# Crie seu projeto (interativo)
+pnpm dev my-awesome-project
+
+# Escolha os módulos que deseja:
+# ✓ Leads/CRM (Kanban + Redis)
+# ✓ Submissions (Forms)
+# ✓ Billing/Stripe (Payments)
+# ✓ Storage/MinIO (S3 Files)
+
+# Aguarde ~2-3 minutos...
+# Pronto! Projeto criado com Docker, database e tudo configurado!
+```
+
+### ✨ O que a CLI faz por você:
+
+✅ Copia e configura o boilerplate
+✅ Remove módulos não selecionados
+✅ Gera `docker-compose.yml` e `.env` customizados
+✅ Cria banco PostgreSQL automaticamente
+✅ Sobe containers Docker
+✅ Instala dependências
+✅ Roda migrations
+✅ **Projeto pronto em 3 minutos!**
+
+📖 **Documentação completa**: [CLI-USAGE.md](./CLI-USAGE.md)
+
+---
+
 ## Stack Técnica
 
 - **Frontend**: Next.js 14 (App Router), React 18, TypeScript

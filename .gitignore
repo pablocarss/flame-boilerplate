@@ -54,3 +54,9 @@ prisma/migrations/**/migration_lock.toml
 # Logs
 logs
 *.log
+
+# CLI test projects
+project/
+test-project/
+my-*-project/
+*-test/

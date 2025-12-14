@@ -24,7 +24,11 @@
     "docker:down": "docker-compose down",
     "docker:build": "docker-compose build",
     "mcp:build": "tsc mcp/server.ts --outDir mcp --module commonjs --target es2020 --moduleResolution node --esModuleInterop",
-    "mcp:start": "node mcp/server.js"
+    "mcp:start": "node mcp/server.js",
+    "cli:install": "cd cli && pnpm install",
+    "cli:build": "cd cli && pnpm build",
+    "cli:dev": "cd cli && pnpm dev",
+    "cli:setup": "pnpm cli:install && pnpm cli:build"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
