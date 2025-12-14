@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn } from '@/shared/utils/utils';
 import {
   Flame,
   LayoutDashboard,
@@ -88,7 +88,10 @@ export function DashboardSidebar() {
       </div>
       <nav className="flex-1 px-4 space-y-1">
         {navigation.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          // Para o dashboard, só marcar como ativo se for exatamente a rota
+          const isActive = item.href === "/dashboard"
+            ? pathname === item.href
+            : pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (
             <Link
               key={item.name}

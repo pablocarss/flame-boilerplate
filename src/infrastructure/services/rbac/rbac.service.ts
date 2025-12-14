@@ -1,5 +1,5 @@
-import { prisma } from "./prisma";
-import { getCurrentUser } from "./auth";
+import { prisma } from "@/infrastructure/prisma/client";
+import { getCurrentUser } from "@/infrastructure/services/auth/auth.service";
 import type { Role } from "@prisma/client";
 
 export type Permission =

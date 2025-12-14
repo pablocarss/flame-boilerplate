@@ -16,14 +16,14 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import {
   updateProfileSchema,
   changePasswordSchema,
   type UpdateProfileInput,
   type ChangePasswordInput,
-} from "@/lib/validations";
-import { getInitials } from "@/lib/utils";
+} from '@/application/validators/schemas';
+import { getInitials } from '@/shared/utils/utils';
 import { Loader2, Upload } from "lucide-react";
 
 interface UserProfile {

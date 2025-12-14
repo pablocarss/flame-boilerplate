@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { generatePasswordResetToken } from "@/lib/auth";
-import { sendPasswordResetEmail } from "@/lib/email";
-import { forgotPasswordSchema } from "@/lib/validations";
+import { prisma } from "@/infrastructure/prisma/client";
+import { generatePasswordResetToken } from '@/infrastructure/services/auth/auth.service';
+import { sendPasswordResetEmail } from '@/infrastructure/services/email/email.service';
+import { forgotPasswordSchema } from '@/application/validators/schemas';
 
 export async function POST(request: NextRequest) {
   try {

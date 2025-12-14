@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { verifyAuth } from "@/lib/auth";
+import { prisma } from "@/infrastructure/prisma/client";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
 
 /**
  * PATCH /api/notifications/mark-all-read
@@ -8,7 +8,7 @@ import { verifyAuth } from "@/lib/auth";
  */
 export async function PATCH(req: NextRequest) {
   try {
-    const user = await verifyAuth(req);
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

@@ -16,8 +16,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
-import { registerSchema, type RegisterInput } from "@/lib/validations";
+import { useToast } from "@/hooks/use-toast";
+import { registerSchema, type RegisterInput } from '@/application/validators/schemas';
 import { Loader2 } from "lucide-react";
 
 export default function RegisterPage() {

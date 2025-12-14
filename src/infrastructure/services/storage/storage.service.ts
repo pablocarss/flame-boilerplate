@@ -1,5 +1,5 @@
 import * as Minio from "minio";
-import { prisma } from "./prisma";
+import { prisma } from "@/infrastructure/prisma/client";
 
 const minioClient = new Minio.Client({
   endPoint: process.env.MINIO_ENDPOINT || "localhost",

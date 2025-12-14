@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { guardOrganization } from "@/lib/rbac";
+import { prisma } from "@/infrastructure/prisma/client";
+import { guardOrganization } from '@/infrastructure/services/rbac/rbac.service';
 
 export async function PATCH(
   request: NextRequest,

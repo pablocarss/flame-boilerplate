@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
-import { verifyPasswordResetToken, invalidateAllUserTokens } from "@/lib/auth";
-import { resetPasswordSchema } from "@/lib/validations";
+import { prisma } from "@/infrastructure/prisma/client";
+import { verifyPasswordResetToken, invalidateAllUserTokens } from '@/infrastructure/services/auth/auth.service';
+import { resetPasswordSchema } from '@/application/validators/schemas';
 
 export async function POST(request: NextRequest) {
   try {

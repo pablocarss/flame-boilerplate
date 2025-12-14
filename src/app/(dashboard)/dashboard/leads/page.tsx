@@ -40,17 +40,22 @@ import {
 import {
   Users,
   Plus,
-  Eye,
+  Edit,
   Trash2,
   TrendingUp,
   DollarSign,
   Mail,
   Phone,
   Building2,
+  LayoutGrid,
+  LayoutList,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
+import { EditLeadDialog } from "@/components/leads/edit-lead-dialog";
+import { DeleteLeadDialog } from "@/components/leads/delete-lead-dialog";
+import { KanbanBoard } from "@/components/leads/kanban-board";
 
 interface Lead {
   id: string;
@@ -76,10 +81,12 @@ export default function LeadsPage() {
   const [loading, setLoading] = useState(true);
   const [organizationId, setOrganizationId] = useState("");
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [statusCounts, setStatusCounts] = useState<Record<string, number>>({});
+  const [viewMode, setViewMode] = useState<"table" | "kanban">("table");
 
   // Form state for new lead
   const [newLead, setNewLead] = useState({
@@ -88,6 +95,7 @@ export default function LeadsPage() {
     phone: "",
     company: "",
     position: "",
+    status: "NEW",
     source: "WEBSITE",
     value: "",
     notes: "",
@@ -105,15 +113,45 @@ export default function LeadsPage() {
 
   const fetchOrganizations = async () => {
     try {
+      console.log("Fetching organizations...");
       const response = await fetch("/api/organizations");
+      console.log("Organizations response status:", response.status);
+
       if (response.ok) {
-        const orgs = await response.json();
+        const data = await response.json();
+        console.log("Organizations data:", data);
+        const orgs = data.organizations || [];
+        console.log("Organizations array:", orgs);
+
         if (orgs.length > 0) {
+          console.log("Setting organization ID:", orgs[0].id);
           setOrganizationId(orgs[0].id);
+        } else {
+          setLoading(false);
+          toast({
+            title: "Aviso",
+            description: "Nenhuma organização encontrada. Crie uma organização primeiro.",
+            variant: "destructive",
+          });
         }
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Organizations error:", errorData);
+        setLoading(false);
+        toast({
+          title: "Erro",
+          description: errorData.error || "Não foi possível carregar as organizações",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error fetching organizations:", error);
+      setLoading(false);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar as organizações",
+        variant: "destructive",
+      });
     }
   };
 
@@ -123,11 +161,23 @@ export default function LeadsPage() {
       let url = `/api/leads?organizationId=${organizationId}`;
       if (filterStatus !== "all") url += `&status=${filterStatus}`;
 
+      console.log("Fetching leads from:", url);
       const response = await fetch(url);
+      console.log("Leads response status:", response.status);
+
       if (response.ok) {
         const data = await response.json();
-        setLeads(data.leads);
+        console.log("Leads data:", data);
+        setLeads(data.leads || []);
         setStatusCounts(data.statusCounts || {});
+      } else {
+        const errorData = await response.json().catch(() => ({ error: "Erro desconhecido" }));
+        console.error("Leads error:", errorData);
+        toast({
+          title: "Erro",
+          description: errorData.error || "Não foi possível carregar os leads",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error fetching leads:", error);
@@ -142,6 +192,10 @@ export default function LeadsPage() {
   };
 
   const createLead = async () => {
+    console.log("Create lead called");
+    console.log("New lead data:", newLead);
+    console.log("Organization ID:", organizationId);
+
     if (!newLead.name || !newLead.email) {
       toast({
         title: "Erro",
@@ -151,16 +205,30 @@ export default function LeadsPage() {
       return;
     }
 
+    if (!organizationId) {
+      toast({
+        title: "Erro",
+        description: "Nenhuma organização selecionada",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
+      const payload = {
+        organizationId,
+        ...newLead,
+        value: newLead.value ? parseFloat(newLead.value) : undefined,
+      };
+      console.log("Sending payload:", payload);
+
       const response = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          organizationId,
-          ...newLead,
-          value: newLead.value ? parseFloat(newLead.value) : undefined,
-        }),
+        body: JSON.stringify(payload),
       });
+
+      console.log("Create lead response status:", response.status);
 
       if (response.ok) {
         setNewLead({
@@ -169,6 +237,7 @@ export default function LeadsPage() {
           phone: "",
           company: "",
           position: "",
+          status: "NEW",
           source: "WEBSITE",
           value: "",
           notes: "",
@@ -181,6 +250,7 @@ export default function LeadsPage() {
         });
       } else {
         const error = await response.json();
+        console.error("Create lead error:", error);
         toast({
           title: "Erro",
           description: error.error || "Não foi possível criar o lead",
@@ -197,64 +267,14 @@ export default function LeadsPage() {
     }
   };
 
-  const updateLeadStatus = async (id: string, status: string) => {
-    try {
-      const response = await fetch(`/api/leads/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-
-      if (response.ok) {
-        fetchLeads();
-        if (selectedLead && selectedLead.id === id) {
-          setSelectedLead({ ...selectedLead, status });
-        }
-        toast({
-          title: "Sucesso",
-          description: "Status atualizado com sucesso",
-        });
-      }
-    } catch (error) {
-      console.error("Error updating lead:", error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível atualizar o status",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const deleteLead = async (id: string) => {
-    if (!confirm("Tem certeza que deseja deletar este lead?")) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/leads/${id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        fetchLeads();
-        toast({
-          title: "Sucesso",
-          description: "Lead deletado com sucesso",
-        });
-      }
-    } catch (error) {
-      console.error("Error deleting lead:", error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível deletar o lead",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const viewLead = (lead: Lead) => {
+  const editLead = (lead: Lead) => {
     setSelectedLead(lead);
-    setIsViewDialogOpen(true);
+    setIsEditDialogOpen(true);
+  };
+
+  const confirmDeleteLead = (lead: Lead) => {
+    setSelectedLead(lead);
+    setIsDeleteDialogOpen(true);
   };
 
   const getStatusBadge = (status: string) => {
@@ -342,6 +362,8 @@ export default function LeadsPage() {
               {new Intl.NumberFormat("pt-BR", {
                 style: "currency",
                 currency: "BRL",
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
               }).format(totalValue)}
             </CardTitle>
           </CardHeader>
@@ -364,21 +386,44 @@ export default function LeadsPage() {
               </CardDescription>
             </div>
             <div className="flex gap-2">
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="NEW">Novo</SelectItem>
-                  <SelectItem value="CONTACTED">Contatado</SelectItem>
-                  <SelectItem value="QUALIFIED">Qualificado</SelectItem>
-                  <SelectItem value="PROPOSAL">Proposta</SelectItem>
-                  <SelectItem value="NEGOTIATION">Negociação</SelectItem>
-                  <SelectItem value="WON">Ganho</SelectItem>
-                  <SelectItem value="LOST">Perdido</SelectItem>
-                </SelectContent>
-              </Select>
+              {/* View Toggle */}
+              <div className="flex border rounded-md">
+                <Button
+                  variant={viewMode === "table" ? "default" : "ghost"}
+                  size="icon"
+                  onClick={() => setViewMode("table")}
+                  title="Visualização em tabela"
+                >
+                  <LayoutList className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "kanban" ? "default" : "ghost"}
+                  size="icon"
+                  onClick={() => setViewMode("kanban")}
+                  title="Visualização em kanban"
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {viewMode === "table" && (
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="NEW">Novo</SelectItem>
+                    <SelectItem value="CONTACTED">Contatado</SelectItem>
+                    <SelectItem value="QUALIFIED">Qualificado</SelectItem>
+                    <SelectItem value="PROPOSAL">Proposta</SelectItem>
+                    <SelectItem value="NEGOTIATION">Negociação</SelectItem>
+                    <SelectItem value="WON">Ganho</SelectItem>
+                    <SelectItem value="LOST">Perdido</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+
               <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                 <DialogTrigger asChild>
                   <Button>
@@ -434,6 +479,23 @@ export default function LeadsPage() {
                         value={newLead.position}
                         onChange={(e) => setNewLead({ ...newLead, position: e.target.value })}
                       />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="status">Status Inicial</Label>
+                      <Select value={newLead.status} onValueChange={(value) => setNewLead({ ...newLead, status: value })}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="NEW">Novo</SelectItem>
+                          <SelectItem value="CONTACTED">Contatado</SelectItem>
+                          <SelectItem value="QUALIFIED">Qualificado</SelectItem>
+                          <SelectItem value="PROPOSAL">Proposta</SelectItem>
+                          <SelectItem value="NEGOTIATION">Negociação</SelectItem>
+                          <SelectItem value="WON">Ganho</SelectItem>
+                          <SelectItem value="LOST">Perdido</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="source">Origem</Label>
@@ -493,6 +555,13 @@ export default function LeadsPage() {
               <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>Nenhum lead encontrado</p>
             </div>
+          ) : viewMode === "kanban" ? (
+            <KanbanBoard
+              leads={leads}
+              onLeadsChange={fetchLeads}
+              onEditLead={editLead}
+              onDeleteLead={confirmDeleteLead}
+            />
           ) : (
             <Table>
               <TableHeader>
@@ -531,6 +600,8 @@ export default function LeadsPage() {
                         ? new Intl.NumberFormat("pt-BR", {
                             style: "currency",
                             currency: "BRL",
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
                           }).format(lead.value)
                         : "-"}
                     </TableCell>
@@ -545,14 +616,16 @@ export default function LeadsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => viewLead(lead)}
+                          onClick={() => editLead(lead)}
+                          title="Editar lead"
                         >
-                          <Eye className="h-4 w-4" />
+                          <Edit className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => deleteLead(lead.id)}
+                          onClick={() => confirmDeleteLead(lead)}
+                          title="Deletar lead"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -566,95 +639,21 @@ export default function LeadsPage() {
         </CardContent>
       </Card>
 
-      {/* View/Edit Dialog */}
-      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Detalhes do Lead</DialogTitle>
-            <DialogDescription>
-              Visualize e atualize as informações do lead
-            </DialogDescription>
-          </DialogHeader>
-          {selectedLead && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm text-muted-foreground">Nome</Label>
-                  <p className="font-medium">{selectedLead.name}</p>
-                </div>
-                <div>
-                  <Label className="text-sm text-muted-foreground">Email</Label>
-                  <p className="font-medium">{selectedLead.email}</p>
-                </div>
-                {selectedLead.phone && (
-                  <div>
-                    <Label className="text-sm text-muted-foreground">Telefone</Label>
-                    <p className="font-medium">{selectedLead.phone}</p>
-                  </div>
-                )}
-                {selectedLead.company && (
-                  <div>
-                    <Label className="text-sm text-muted-foreground">Empresa</Label>
-                    <p className="font-medium">{selectedLead.company}</p>
-                  </div>
-                )}
-                {selectedLead.position && (
-                  <div>
-                    <Label className="text-sm text-muted-foreground">Cargo</Label>
-                    <p className="font-medium">{selectedLead.position}</p>
-                  </div>
-                )}
-                <div>
-                  <Label className="text-sm text-muted-foreground">Origem</Label>
-                  <p className="font-medium">{getSourceLabel(selectedLead.source)}</p>
-                </div>
-                {selectedLead.value && (
-                  <div>
-                    <Label className="text-sm text-muted-foreground">Valor Estimado</Label>
-                    <p className="font-medium">
-                      {new Intl.NumberFormat("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      }).format(selectedLead.value)}
-                    </p>
-                  </div>
-                )}
-              </div>
+      {/* Edit Lead Dialog */}
+      <EditLeadDialog
+        lead={selectedLead}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onLeadUpdated={fetchLeads}
+      />
 
-              {selectedLead.notes && (
-                <div>
-                  <Label className="text-sm text-muted-foreground">Observações</Label>
-                  <p className="mt-1 text-sm">{selectedLead.notes}</p>
-                </div>
-              )}
-
-              <div>
-                <Label htmlFor="lead-status">Atualizar Status</Label>
-                <Select
-                  defaultValue={selectedLead.status}
-                  onValueChange={(value) => updateLeadStatus(selectedLead.id, value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="NEW">Novo</SelectItem>
-                    <SelectItem value="CONTACTED">Contatado</SelectItem>
-                    <SelectItem value="QUALIFIED">Qualificado</SelectItem>
-                    <SelectItem value="PROPOSAL">Proposta</SelectItem>
-                    <SelectItem value="NEGOTIATION">Negociação</SelectItem>
-                    <SelectItem value="WON">Ganho</SelectItem>
-                    <SelectItem value="LOST">Perdido</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          )}
-          <DialogFooter>
-            <Button onClick={() => setIsViewDialogOpen(false)}>Fechar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Delete Lead Dialog */}
+      <DeleteLeadDialog
+        lead={selectedLead}
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onLeadDeleted={fetchLeads}
+      />
     </div>
   );
 }

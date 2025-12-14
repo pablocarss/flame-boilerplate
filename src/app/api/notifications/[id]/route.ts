@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { verifyAuth } from "@/lib/auth";
+import { prisma } from "@/infrastructure/prisma/client";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
 
 /**
  * PATCH /api/notifications/:id
@@ -11,7 +11,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await verifyAuth(req);
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -61,7 +61,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await verifyAuth(req);
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

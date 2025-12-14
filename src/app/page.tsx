@@ -28,7 +28,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { CompanyLogos } from "@/components/company-logos";
 

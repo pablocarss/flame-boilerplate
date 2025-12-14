@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { createOrganizationSchema } from "@/lib/validations";
-import { generateSlug } from "@/lib/utils";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
+import { prisma } from "@/infrastructure/prisma/client";
+import { createOrganizationSchema } from '@/application/validators/schemas';
+import { generateSlug } from '@/shared/utils/utils';
 
 export async function GET() {
   try {

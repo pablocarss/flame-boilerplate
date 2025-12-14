@@ -14,12 +14,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import {
   createOrganizationSchema,
   type CreateOrganizationInput,
-} from "@/lib/validations";
-import { generateSlug } from "@/lib/utils";
+} from '@/application/validators/schemas';
+import { generateSlug } from '@/shared/utils/utils';
 import { Loader2 } from "lucide-react";
 
 export default function NewOrganizationPage() {

@@ -15,8 +15,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
-import { forgotPasswordSchema, type ForgotPasswordInput } from "@/lib/validations";
+import { useToast } from "@/hooks/use-toast";
+import { forgotPasswordSchema, type ForgotPasswordInput } from '@/application/validators/schemas';
 import { Loader2, ArrowLeft, Mail } from "lucide-react";
 
 export default function ForgotPasswordPage() {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
+import { prisma } from "@/infrastructure/prisma/client";
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { verifyAuth } from "@/lib/auth";
-import { guardOrganization } from "@/lib/rbac";
+import { prisma } from "@/infrastructure/prisma/client";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
+import { guardOrganization } from '@/infrastructure/services/rbac/rbac.service';
 
 /**
  * GET /api/submissions?organizationId=xxx
@@ -9,9 +9,9 @@ import { guardOrganization } from "@/lib/rbac";
  */
 export async function GET(req: NextRequest) {
   try {
-    const user = await verifyAuth(req);
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
     if (!organizationId) {
       return NextResponse.json(
-        { error: "organizationId is required" },
+        { error: "ID da organização é obrigatório" },
         { status: 400 }
       );
     }
@@ -32,12 +32,13 @@ export async function GET(req: NextRequest) {
     const guard = await guardOrganization(organizationId, "submission:read");
 
     if (!guard.success) {
+      console.error("Permission denied:", guard.error);
       return NextResponse.json({ error: guard.error }, { status: guard.status });
     }
 
     const where: any = { organizationId };
-    if (status) where.status = status;
-    if (formType) where.formType = formType;
+    if (status && status !== "all") where.status = status;
+    if (formType && formType !== "all") where.formType = formType;
 
     const [submissions, total] = await Promise.all([
       prisma.submission.findMany({
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("Error fetching submissions:", error);
     return NextResponse.json(
-      { error: "Failed to fetch submissions" },
+      { error: "Falha ao carregar submissões. Por favor, tente novamente." },
       { status: 500 }
     );
   }

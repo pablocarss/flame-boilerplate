@@ -21,8 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
-import { createInviteSchema, type CreateInviteInput } from "@/lib/validations";
+import { useToast } from "@/hooks/use-toast";
+import { createInviteSchema, type CreateInviteInput } from '@/application/validators/schemas';
 import { Loader2 } from "lucide-react";
 
 interface Organization {

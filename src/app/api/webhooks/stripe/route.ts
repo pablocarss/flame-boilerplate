@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { verifyWebhookSignature, processWebhookEvent } from "@/lib/stripe";
+import { verifyWebhookSignature, processWebhookEvent } from '@/infrastructure/services/payment/stripe.service';
 
 export async function POST(request: NextRequest) {
   try {

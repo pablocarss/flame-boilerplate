@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
-import { getPresignedUploadUrl } from "@/lib/storage";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
+import { getPresignedUploadUrl } from '@/infrastructure/services/storage/storage.service';
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { createInviteSchema } from "@/lib/validations";
-import { sendInviteEmail } from "@/lib/email";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
+import { prisma } from "@/infrastructure/prisma/client";
+import { createInviteSchema } from '@/application/validators/schemas';
+import { sendInviteEmail } from '@/infrastructure/services/email/email.service';
 
 export async function GET() {
   try {

@@ -21,7 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { MoreHorizontal, Shield, User, UserMinus, Loader2 } from "lucide-react";
 import type { Role } from "@prisma/client";
 

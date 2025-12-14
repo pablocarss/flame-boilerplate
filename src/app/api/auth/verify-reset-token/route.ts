@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyPasswordResetToken } from "@/lib/auth";
+import { verifyPasswordResetToken } from '@/infrastructure/services/auth/auth.service';
 
 export async function GET(request: NextRequest) {
   try {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
-import { uploadFile } from "@/lib/storage";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
+import { uploadFile } from '@/infrastructure/services/storage/storage.service';
 
 export async function POST(request: NextRequest) {
   try {

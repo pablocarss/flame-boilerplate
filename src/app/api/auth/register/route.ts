@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/infrastructure/prisma/client";
 import {
   generateAccessToken,
   generateRefreshToken,
   setAuthCookies,
-} from "@/lib/auth";
-import { registerSchema } from "@/lib/validations";
-import { sendWelcomeEmail } from "@/lib/email";
+} from '@/infrastructure/services/auth/auth.service';
+import { registerSchema } from '@/application/validators/schemas';
+import { sendWelcomeEmail } from '@/infrastructure/services/email/email.service';
 
 export async function POST(request: NextRequest) {
   try {

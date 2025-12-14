@@ -11,11 +11,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getInitials } from "@/lib/utils";
+import { getInitials } from '@/shared/utils/utils';
 import { LogOut, Settings, User } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationsDropdown } from "@/components/dashboard/notifications-dropdown";
-import type { UserSession } from "@/lib/auth";
+import type { UserSession } from '@/infrastructure/services/auth/auth.service';
 
 interface DashboardHeaderProps {
   user: UserSession;

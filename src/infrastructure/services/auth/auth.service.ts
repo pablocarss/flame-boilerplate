@@ -1,6 +1,6 @@
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import { cookies } from "next/headers";
-import { prisma } from "./prisma";
+import { prisma } from "@/infrastructure/prisma/client";
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "default-secret-change-in-production"

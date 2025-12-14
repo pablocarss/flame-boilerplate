@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
+import { prisma } from "@/infrastructure/prisma/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate } from '@/shared/utils/utils';
 import { Check, CreditCard, Building2 } from "lucide-react";
 import { ManageSubscriptionButton } from "@/components/billing/manage-subscription-button";
 import { SelectPlanButton } from "@/components/billing/select-plan-button";

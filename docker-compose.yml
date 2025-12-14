@@ -55,11 +55,12 @@ services:
       exit 0;
       "
 
-  # Redis (for caching and rate limiting)
+  # Redis (for caching, rate limiting, and background jobs)
   redis:
     image: redis:7-alpine
     container_name: flame-redis
     restart: unless-stopped
+    command: redis-server --appendonly yes
     ports:
       - "6380:6379"
     volumes:

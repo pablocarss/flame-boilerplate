@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { verifyAuth } from "@/lib/auth";
-import { guardOrganization } from "@/lib/rbac";
+import { prisma } from "@/infrastructure/prisma/client";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
+import { guardOrganization } from '@/infrastructure/services/rbac/rbac.service';
 
 /**
  * GET /api/submissions/:id
@@ -12,7 +12,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await verifyAuth(req);
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -59,7 +59,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await verifyAuth(req);
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -120,7 +120,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await verifyAuth(req);
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

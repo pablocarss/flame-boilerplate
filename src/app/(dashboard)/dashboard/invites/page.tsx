@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
+import { prisma } from "@/infrastructure/prisma/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Mail, Clock, CheckCircle, XCircle } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from '@/shared/utils/utils';
 import { RevokeInviteButton } from "@/components/invites/revoke-button";
 
 async function getInvites(userId: string) {

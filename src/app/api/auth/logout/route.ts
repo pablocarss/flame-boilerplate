@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { invalidateRefreshToken, clearAuthCookies } from "@/lib/auth";
+import { invalidateRefreshToken, clearAuthCookies } from '@/infrastructure/services/auth/auth.service';
 
 export async function POST(request: NextRequest) {
   try {

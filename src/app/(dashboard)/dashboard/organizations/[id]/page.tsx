@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
+import { prisma } from "@/infrastructure/prisma/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,7 +22,7 @@ import {
   Crown,
   User,
 } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from '@/shared/utils/utils';
 
 async function getOrganization(organizationId: string, userId: string) {
   const organization = await prisma.organization.findUnique({

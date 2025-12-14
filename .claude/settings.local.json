@@ -26,7 +26,10 @@
       "Bash(git rm:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(del \"C:\\Users\\Dell\\Downloads\\flame-boilerplate\\flame-boilerplate\\src\\lib\\prisma.ts\" \"C:\\Users\\Dell\\Downloads\\flame-boilerplate\\flame-boilerplate\\src\\lib\\validations.ts\" \"C:\\Users\\Dell\\Downloads\\flame-boilerplate\\flame-boilerplate\\update-imports.js\")"
     ]
   }
 }

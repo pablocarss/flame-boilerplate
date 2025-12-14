@@ -83,15 +83,45 @@ export default function SubmissionsPage() {
 
   const fetchOrganizations = async () => {
     try {
+      console.log("Fetching organizations...");
       const response = await fetch("/api/organizations");
+      console.log("Organizations response status:", response.status);
+
       if (response.ok) {
-        const orgs = await response.json();
+        const data = await response.json();
+        console.log("Organizations data:", data);
+        const orgs = data.organizations || [];
+        console.log("Organizations array:", orgs);
+
         if (orgs.length > 0) {
+          console.log("Setting organization ID:", orgs[0].id);
           setOrganizationId(orgs[0].id);
+        } else {
+          setLoading(false);
+          toast({
+            title: "Aviso",
+            description: "Nenhuma organização encontrada. Crie uma organização primeiro.",
+            variant: "destructive",
+          });
         }
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Organizations error:", errorData);
+        setLoading(false);
+        toast({
+          title: "Erro",
+          description: errorData.error || "Não foi possível carregar as organizações",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error fetching organizations:", error);
+      setLoading(false);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar as organizações",
+        variant: "destructive",
+      });
     }
   };
 
@@ -102,10 +132,22 @@ export default function SubmissionsPage() {
       if (filterStatus !== "all") url += `&status=${filterStatus}`;
       if (filterFormType !== "all") url += `&formType=${filterFormType}`;
 
+      console.log("Fetching submissions from:", url);
       const response = await fetch(url);
+      console.log("Submissions response status:", response.status);
+
       if (response.ok) {
         const data = await response.json();
-        setSubmissions(data.submissions);
+        console.log("Submissions data:", data);
+        setSubmissions(data.submissions || []);
+      } else {
+        const errorData = await response.json().catch(() => ({ error: "Erro desconhecido" }));
+        console.error("Submissions error:", errorData);
+        toast({
+          title: "Erro",
+          description: errorData.error || "Não foi possível carregar as submissões",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Error fetching submissions:", error);

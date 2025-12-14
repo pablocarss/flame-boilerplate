@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { updateIntegrationSchema } from "@/lib/validations";
-import { guardOrganization } from "@/lib/rbac";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
+import { prisma } from "@/infrastructure/prisma/client";
+import { updateIntegrationSchema } from '@/application/validators/schemas';
+import { guardOrganization } from '@/infrastructure/services/rbac/rbac.service';
 
 export async function PATCH(
   request: NextRequest,

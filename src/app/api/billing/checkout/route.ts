@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
-import { guardOrganization } from "@/lib/rbac";
-import { createCheckoutSession } from "@/lib/stripe";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
+import { guardOrganization } from '@/infrastructure/services/rbac/rbac.service';
+import { createCheckoutSession } from '@/infrastructure/services/payment/stripe.service';
 
 export async function POST(request: NextRequest) {
   try {

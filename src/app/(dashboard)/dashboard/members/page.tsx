@@ -1,5 +1,5 @@
-import { getCurrentUser } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
+import { prisma } from "@/infrastructure/prisma/client";
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { getInitials } from "@/lib/utils";
+import { getInitials } from '@/shared/utils/utils';
 import { Users } from "lucide-react";
 import { MemberActions } from "@/components/members/member-actions";
 

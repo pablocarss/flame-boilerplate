@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { verifyAuth } from "@/lib/auth";
+import { prisma } from "@/infrastructure/prisma/client";
+import { getCurrentUser } from '@/infrastructure/services/auth/auth.service';
 
 /**
  * GET /api/notifications
@@ -8,7 +8,7 @@ import { verifyAuth } from "@/lib/auth";
  */
 export async function GET(req: NextRequest) {
   try {
-    const user = await verifyAuth(req);
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const user = await verifyAuth(req);
+    const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

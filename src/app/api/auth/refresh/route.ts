@@ -6,7 +6,7 @@ import {
   generateRefreshToken,
   invalidateRefreshToken,
   setAuthCookies,
-} from "@/lib/auth";
+} from '@/infrastructure/services/auth/auth.service';
 
 export async function POST(request: NextRequest) {
   try {

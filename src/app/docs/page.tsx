@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import {
   ArrowLeft,
-  BookOpen,
+  Flame,
   Code,
   Zap,
   Shield,
@@ -133,7 +133,7 @@ export default function DocsPage() {
                 className="flex items-center gap-2 font-bold text-xl"
               >
                 <div className="bg-gradient-to-r from-orange-500 to-pink-500 p-2 rounded-lg">
-                  <BookOpen className="h-5 w-5 text-white" />
+                  <Flame className="h-5 w-5 text-white" />
                 </div>
                 <span className="hidden sm:inline bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
                   Flame Docs
